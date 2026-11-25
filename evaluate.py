@@ -272,7 +272,8 @@ def judge(q: dict, res: dict, checks: dict, cache: dict) -> dict:
 
     from api_key import load_api_key
 
-    client = genai.Client(api_key=load_api_key())
+    # 90 s per request: a call that hangs fails and is retried instead of blocking the run.
+    client = genai.Client(api_key=load_api_key(), http_options=types.HttpOptions(timeout=90_000))
     models = [JUDGE_MODEL] + [m for m in JUDGE_FALLBACKS if m != JUDGE_MODEL]
     response, used, last_error = None, None, None
     for model in models:
