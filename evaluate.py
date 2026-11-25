@@ -190,7 +190,7 @@ async def answer_all(questions: list[dict], fresh: bool) -> dict[str, dict]:
     cached = {} if fresh else load_answers()
     todo = [q for q in questions
             if q["id"] not in cached or cached[q["id"]]["question"] != q["question"]
-            or cached[q["id"]].get("model") != AGENT_MODEL]
+            or cached[q["id"]].get("model") != AGENT_MODEL or cached[q["id"]].get("error")]
     log(f"\nAgent ({AGENT_MODEL}): {len(todo)} questions to answer, {len(questions) - len(todo)} cached.")
     if todo:
         async with Harness(approve=reject_all) as harness:
@@ -203,6 +203,10 @@ async def answer_all(questions: list[dict], fresh: bool) -> dict[str, dict]:
                               "citations": {"cited": [], "valid": [], "invalid": [], "retrieved": []},
                               "guard_fired": False, "model": AGENT_MODEL}
                 result["id"] = q["id"]
+                if any("Search unavailable" in step["output"] for step in result.get("trace", [])):
+                    # The embedding quota ran out mid-question: the answer is not a real
+                    # refusal, so it is marked and asked again on the next run.
+                    result["error"] = "embedding quota exhausted during search"
                 cached[q["id"]] = result
                 log(f"  {q['id']} ({i}/{len(todo)}) {result['seconds']}s "
                     f"{'REFUSAL' if result['refusal'] else ''} {result.get('error', '')}")
