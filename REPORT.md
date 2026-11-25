@@ -73,7 +73,7 @@ Hit rate on the 30 answerable questions, using the question text as the query. A
 | fixed (200 words, 40 overlap) | dense | 60% | 70% | 83% | 50% | 991 |
 | fixed | hybrid (BM25 + dense, RRF) | 37% | 73% | 77% | 33% | 978 |
 | **struct (one article or question)** | **dense** | **60%** | **80%** | **90%** | 33% | 1,203 |
-| struct | hybrid | 43% | 70% | 73% | 50% | 1,314 |
+| struct | hybrid | 43% | 70% | 73% | 50% | 1,322 |
 
 ![Hit rate by design](eval/retrieval.png)
 
@@ -220,7 +220,7 @@ The subagent searched three times and gave the same core answer as my harness on
 - **Document added:** the CNMV's notice of the result of the offer, 16 Oct 2025 (`docs/cnmv_resultado_opa_bbva_sabadell.pdf`, from cnmv.es). The agent called `add_document`, the harness stopped for my approval, I approved, and the tool reported 1 chunk, 1 embedded, id `CNMV-RESULTADO-OPA-BBVA-SABADELL`.
 - **After:** "La OPA fue aceptada por 1.272.671.801 acciones, que representan un 25,33% [...] del capital social de Banco Sabadell, y un 25,47% de sus derechos de voto [...] la oferta quedó sin efecto [CNMV-RESULTADO-OPA-BBVA-SABADELL, Página 1]."
 
-Since the demo the live index holds six documents, so q32 is now answerable. The evaluation results below were produced before the document was added.
+Since the demo the live index holds six documents, so q32 is now answerable. The agent answers and judge verdicts below were produced before the document was added. The final `check.py --evaluate` run re-ran retrieval with the new chunk in the index, and the only number that moved was the words added by struct hybrid search (1,314 to 1,322).
 
 ## Harness and guardrails
 
@@ -321,8 +321,6 @@ Six of the seven failures are omissions and none are invented facts. Five of the
 
 ## Decision
 
-<!-- DRAFT: Jesús, rewrite this in your own words or confirm it, then delete this line. -->
-
 **Would I let users rely on it?** Not as the only source for a trading decision. I would let the analysts on the desk use it as a first look up tool with citations, for single rule questions: a deadline, a threshold, a condition in one article. On those it was right 10 times out of 12 in my grades, every claim it made was in the passage it cited, and it refused all five questions outside the corpus. It is not ready for questions that combine several rules, like building the full timeline of a deal with CNMC and foreign investment clearance, where it got 2 of 6.
 
 **With which safeguard.** The citation guard stays on in blocking mode, and the analyst opens the cited article before the answer goes into a position or a model. Anything about a live deal goes to the offer prospectus and to deal counsel. I would review the decision after the three fixes above, with a judge that checks completeness and my grades on all 30 answerable questions.
@@ -342,8 +340,8 @@ Almost all the tokens are the five retrieved passages, so cost is driven by the 
 
 I used Claude (Anthropic) throughout:
 - **Code.** Claude wrote most of the code (`index.py`, `rag.py`, `server.py`, `agent.py`, `evaluate.py`, `eval/guard_demo.py`) and fixed the bugs we found running it. I ran everything in GitHub Codespaces and checked the outputs.
-- **Drafts I reviewed.** Claude drafted `AGENTS.md`, the subagent file and the judge rubric from my use case, and I edited and approved them. It also drafted the reference answers from the articles I chose for each question, and I checked them against the text.
-- **This report.** Claude drafted the text from my decisions, my grades, my failure classification and the numbers in `eval/`. I reviewed and edited it, and wrote the decision.
+- **Drafts I kept.** Claude drafted `AGENTS.md`, the subagent file and the judge rubric from my use case and my refusal policy. I kept them unchanged for the whole evaluation, so the results match them (the rubric file still carries its draft note because the judge cache is keyed on its exact text). Claude also drafted the reference answers from the article I named for each question, and I used them as the standard when I graded 23 answers.
+- **This report.** Claude drafted the text from my decisions, my grades, my failure classification and the numbers in `eval/`, and helped me word the decision. I reviewed it.
 - **Mine.** The use case, the choice of documents (and leaving out the UK Takeover Code), the 35 questions, the choice of the `struct` dense design, blocking rather than flagging in the citation guard, the refusal policy, the 23 grades (done before seeing the judge), the classification of each failure and the decision.
 
 Gemini (`gemini-embedding-2`, `gemini-3.5-flash-lite`) is used inside the system for embeddings, the agent and the judge.
