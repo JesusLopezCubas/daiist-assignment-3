@@ -45,7 +45,29 @@ MAX_MODEL_CALLS = 10
 CITATION_GUARD = os.environ.get("CITATION_GUARD", "block")
 
 REFUSAL_MARKER = "El corpus no cubre esta pregunta"
-CITATION_RE = re.compile(r"\[([A-Z0-9][A-Z0-9\-]+),\s*([^\]]+?)\]")
+BRACKET_RE = re.compile(r"\[([^\[\]]+)\]")
+DOC_LOC_RE = re.compile(r"^\s*([A-Z0-9][A-Z0-9\-]+),\s*(.+?)\s*$")
+LOCATION_WORDS = ("Artículo", "Pregunta", "Disposición", "Preámbulo", "Considerandos", "Página", "Introducción", "Inicio")
+
+
+def parse_citations(answer: str) -> list[tuple[str, str]]:
+    """(doc_id, location) for every citation in the answer.
+
+    Handles one passage per bracket, [RD1066-2007, Artículo 23], and the compound
+    forms models also write: [RD571-2023, Preámbulo; Artículo 14] or
+    [LEY19-2003, Artículo 7 bis; RD571-2023, Artículo 11].
+    """
+    found = []
+    for content in BRACKET_RE.findall(answer):
+        doc = None
+        for part in content.split(";"):
+            match = DOC_LOC_RE.match(part)
+            if match:
+                doc = match.group(1)
+                found.append((doc, match.group(2)))
+            elif doc and part.strip().startswith(LOCATION_WORDS):
+                found.append((doc, part.strip()))
+    return found
 RESULT_CITE_RE = re.compile(r"cite as \[([^,\]]+),\s*([^\]]+)\]")
 
 
@@ -73,7 +95,7 @@ def check_citations(answer: str, trace: list[dict]) -> dict:
     'Artículo 23'), so a cited location only has to start with a retrieved one.
     """
     retrieved = retrieved_citations(trace)
-    cited = [(d.strip(), loc.strip()) for d, loc in CITATION_RE.findall(answer)]
+    cited = parse_citations(answer)
 
     def ok(doc_id: str, loc: str) -> bool:
         return any(doc_id == d and (loc == l or loc.startswith(l + " ") or loc.startswith(l + "."))

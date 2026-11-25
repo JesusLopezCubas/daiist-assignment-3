@@ -423,8 +423,25 @@ def write_csv(path: Path, rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
+def reapply_guard(answers: dict[str, dict]) -> None:
+    """Run the current citation guard again on each stored raw answer.
+
+    The guard is deterministic (raw answer + retrieved passages), so a fix to it
+    applies to cached answers without asking the model again.
+    """
+    from agent import citation_guard, is_refusal
+
+    for row in answers.values():
+        if row.get("raw_answer") is None or row.get("error"):
+            continue
+        answer, guard = citation_guard(row["raw_answer"], row.get("trace", []), row.get("approvals"))
+        row.update(answer=answer, citations=guard, guard_fired=guard["fired"], refusal=is_refusal(answer))
+
+
 def end_to_end(questions: list[dict], fresh: bool, judge_answers: bool = True) -> None:
     answers = asyncio.run(answer_all(questions, fresh))
+    reapply_guard(answers)
+    write_answers(answers, questions)
     # A sheet to grade by hand BEFORE looking at the judge (eval/human_labels.csv).
     write_csv(EVAL_DIR / "to_grade.csv", [
         {"id": q["id"], "kind": q["kind"], "question": q["question"], "reference_answer": q["reference_answer"],
