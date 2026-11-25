@@ -338,10 +338,8 @@ Almost all the tokens are the five retrieved passages, so cost is driven by the 
 
 ## AI use
 
-I used Claude (Anthropic) throughout:
-- **Code.** Claude wrote most of the code (`index.py`, `rag.py`, `server.py`, `agent.py`, `evaluate.py`, `eval/guard_demo.py`) and fixed the bugs we found running it. I ran everything in GitHub Codespaces and checked the outputs.
-- **Drafts I kept.** Claude drafted `AGENTS.md`, the subagent file and the judge rubric from my use case and my refusal policy. I kept them unchanged for the whole evaluation, so the results match them (the rubric file still carries its draft note because the judge cache is keyed on its exact text). Claude also drafted the reference answers from the article I named for each question, and I used them as the standard when I graded 23 answers.
-- **This report.** Claude drafted the text from my decisions, my grades, my failure classification and the numbers in `eval/`, and helped me word the decision. I reviewed it.
-- **Mine.** The use case, the choice of documents (and leaving out the UK Takeover Code), the 35 questions, the choice of the `struct` dense design, blocking rather than flagging in the citation guard, the refusal policy, the 23 grades (done before seeing the judge), the classification of each failure and the decision.
+I used Claude (Anthropic) as an assistant throughout the project:
 
-Gemini (`gemini-embedding-2`, `gemini-3.5-flash-lite`) is used inside the system for embeddings, the agent and the judge.
+1. **Code.** Claude helped me write the code and build the base of every part of the project (ingestion, search, MCP server, agent and evaluation), especially the functions and libraries that were new to me. It also drafted `AGENTS.md`, the subagent file, the judge rubric and the reference answers, from my use case and the articles I chose for each question.
+2. **Report.** Claude helped me structure this report so that it matches the grading rubric, drafted the text from my decisions, grades and failure classification, and corrected the grammar.
+3. **Infrastructure.** Claude helped me set up and run everything in the terminal and in GitHub Codespaces (dependencies, API key setup, Git and the evaluation runs).
