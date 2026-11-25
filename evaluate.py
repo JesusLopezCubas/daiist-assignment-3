@@ -287,9 +287,16 @@ def judge(q: dict, res: dict, checks: dict, cache: dict) -> dict:
                 break
             except Exception as error:  # noqa: BLE001
                 last_error = error
-                if "404" in str(error) or "NOT_FOUND" in str(error):
-                    break  # model not available: try the next one
-                time.sleep(15 * (attempt + 1))
+                message = str(error)
+                if "404" in message or "NOT_FOUND" in message:
+                    log(f"    judge model {model} not available, trying the next one")
+                    break
+                if "PerDay" in message or "per day" in message.lower():
+                    log(f"    daily quota of {model} used up, trying the next one")
+                    break
+                wait = 15 * (attempt + 1)
+                log(f"    judge {model}: {message[:80]}... retrying in {wait}s")
+                time.sleep(wait)
         if used:
             break
     if not used:
@@ -465,10 +472,12 @@ def end_to_end(questions: list[dict], fresh: bool, judge_answers: bool = True) -
         return
     cache = json.loads(JUDGE_CACHE.read_text(encoding="utf-8")) if JUDGE_CACHE.exists() else {}
     rows = []
+    log("\nJudging answers ...")
     for q in questions:
         res = answers[q["id"]]
         checks = code_checks(q, res)
         verdict = judge(q, res, checks, cache)
+        log(f"  {q['id']}: correct={verdict['correct']} supported={verdict['supported']} ({verdict['by']})")
         result = outcome(q, checks, verdict) if verdict["correct"] != "" else "not_graded"
         rows.append({
             "id": q["id"], "kind": q["kind"], "question": q["question"], "answer": res["answer"],
