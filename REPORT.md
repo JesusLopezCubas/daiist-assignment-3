@@ -108,11 +108,103 @@ The first two results were CNMV questions 11 and 12, which mention plazos but no
 
 **Subagent (`.claude/agents/corpus-researcher.md`).** Its only tool is `mcp__corpus__search`. Its description tells the editor to delegate any question about OPA conditions, acceptance periods, equitable price, competing offers, squeeze-out, CNMV criteria, merger control phases or foreign investment authorisation. Its instructions: search only with `search`, in Spanish, at most four times. Answer only from the returned passages, never from its own knowledge of Spanish law or past deals. Cite every claim as `[DOC, location]` and never invent a citation. Quote numbers exactly with their conditions. Start with "El corpus no cubre esta pregunta" when the passages do not answer. Reply in Spanish in about 150 words.
 
-**Transcript from Claude Code** (question: "¿Cuánto tiempo tiene la CNMV para autorizar una OPA?"):
+**Transcript from Claude Code** (Claude Code in GitHub Codespaces, with the `corpus` server from `.mcp.json`. Full export in `eval/subagent_transcript.md`):
 
 ```
-TRANSCRIPT PENDING
+❯ Usa el subagente corpus-researcher para responder: ¿Cuánto tiempo tiene la
+  CNMV para autorizar una OPA?
+
+● corpus-researcher(CNMV OPA authorization deadline)
+  ⎿  Backgrounded agent (↓ to manage · ctrl+o to expand)
+
+● He lanzado el subagente corpus-researcher con tu pregunta y todavía está
+  buscando en el corpus. Cuando termine te paso el plazo con sus citas o, si el
+  corpus no lo recoge, te lo digo.
+
+✻ Brewed for 7s · done 6:06 PM
+
+› Message from corpus-researcher
+  **Respuesta corta:** la CNMV tiene **20 días hábiles** para autorizar o
+  denegar la OPA. El plazo cuenta desde que recibe la solicitud de autorización.
+
+  **Detalle:**
+  - **Plazo:** el acuerdo de autorización o denegación debe adoptarse "en un
+  plazo de veinte días hábiles a partir de la recepción de la solicitud"
+  [RD1066-2007, Artículo 21].
+  - **Cuándo vuelve a empezar el plazo:** si los documentos complementarios
+  llegan después de la solicitud, o si la CNMV pide información o documentos
+  adicionales, el plazo se computa desde la fecha en que se registran esos
+  documentos o esa información [RD1066-2007, Artículo 21]. La CNMV puede pedir
+  al oferente esa información adicional [RD1066-2007, Artículo 21].
+  - **Admisión a trámite (paso previo):** la CNMV tiene "siete días hábiles"
+  desde que se completa la documentación para admitir la solicitud a trámite. Si
+  no se pronuncia en ese plazo, la solicitud se entiende admitida [RD1066-2007,
+  Artículo 17].
+  - **Otras autorizaciones administrativas previas:** la CNMV no autorizará la
+  oferta hasta que se le acredite la autorización, no oposición o notificación
+  que exija otro organismo. La excepción es que hayan transcurrido los plazos
+  para entender esa autorización concedida por silencio administrativo
+  [RD1066-2007, Artículo 26]. La CNMV aplica este requisito de forma
+  restrictiva: se refiere a autorizaciones "requeridas por la oferta" y de
+  organismos supervisores [CNMV-QA-OPAS, Pregunta 3].
+  - **Ofertas simultáneas en España y en un mercado de fuera de la UE:** la CNMV
+  puede adaptar los plazos [RD1066-2007, Artículo 21].
+  - **Si la CNMV no resuelve en 20 días:** **el corpus no cubre esta pregunta.**
+  Ningún pasaje recuperado dice qué efecto tiene el silencio sobre la
+  autorización de la OPA. El silencio positivo del Artículo 17 vale solo para la
+  admisión a trámite. El del [LDC-15-2007, Artículo 38] se refiere al control
+  de concentraciones de la CNMC, no a la CNMV.
+
+  **Un punto a vigilar:** la ley no dice que los 20 días se cuenten desde la
+  admisión a trámite, sino desde "la recepción de la solicitud" [RD1066-2007,
+  Artículo 21]. Los pasajes no explican cómo encaja esto con el plazo de
+  admisión de 7 días [RD1066-2007, Artículo 17].
+
+  **Citas usadas:**
+  - [RD1066-2007, Artículo 21]
+  - [RD1066-2007, Artículo 17]
+  - [RD1066-2007, Artículo 26]
+  - [CNMV-QA-OPAS, Pregunta 3]
+  - [LDC-15-2007, Artículo 38]
+
+  Hice tres búsquedas.
+
+● La CNMV tiene 20 días hábiles para autorizar o denegar la OPA, contados desde
+  que recibe la solicitud [RD1066-2007, Artículo 21].
+
+  Detalle:
+  - El plazo puede volver a empezar. Si los documentos complementarios llegan
+    después de la solicitud, o si la CNMV pide información adicional, los 20
+    días se cuentan desde que esa documentación queda registrada [RD1066-2007,
+    Artículo 21].
+  - Antes hay un paso de admisión a trámite. La CNMV tiene 7 días hábiles desde
+    que la documentación está completa para admitir la solicitud. Si no dice
+    nada en ese plazo, la solicitud queda admitida [RD1066-2007, Artículo 17].
+  - Otras autorizaciones pueden retrasarla. La CNMV no autoriza la oferta hasta
+    que se le acredite la autorización, no oposición o notificación que exija
+    otro organismo. La excepción es que haya vencido el plazo para darla por
+    concedida por silencio [RD1066-2007, Artículo 26]. La CNMV aplica esto solo
+    a las autorizaciones "requeridas por la oferta" y de organismos supervisores
+    [CNMV-QA-OPAS, Pregunta 3].
+  - Ofertas simultáneas fuera de la UE: si la oferta también se lanza en un
+    mercado de fuera de la UE, la CNMV puede adaptar los plazos [RD1066-2007,
+    Artículo 21].
+
+  Lo que no está claro:
+  - Si la CNMV no resuelve en 20 días: el corpus no cubre esta pregunta. Ningún
+    pasaje dice qué efecto tiene ese silencio sobre la autorización. El silencio
+    positivo del Artículo 17 vale solo para la admisión a trámite.
+  - Cómo encajan los dos plazos: los 20 días se cuentan desde "la recepción de
+    la solicitud" [RD1066-2007, Artículo 21], no desde la admisión. Los pasajes
+    no explican cómo se combina esto con los 7 días de admisión [RD1066-2007,
+    Artículo 17]. Confírmalo con el asesor de la operación.
+
+✻ Baked for 7s · done 6:06 PM
+
+● Agent "CNMV OPA authorization deadline" finished · 24s
 ```
+
+The subagent searched three times and gave the same core answer as my harness on q07 (20 business days from receipt of the application, [RD1066-2007, Artículo 21]), with more context: the 7 business day admission step (Artículo 17) and the other authorisations that can hold the CNMV back (Artículo 26 and CNMV Pregunta 3). It also did what rule 5 asks for the part it could not answer: it said the corpus does not say what happens if the CNMV misses the 20 days, instead of guessing. That same phrase inside a full answer is what my refusal check miscounts in q27 (see Failures).
 
 ## Adding a document
 
