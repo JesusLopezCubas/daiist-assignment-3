@@ -37,8 +37,9 @@ USER_AGENT = "daiist-assignment-3 (IE University coursework; jlopez.ieu2022@stud
 # ---------------------------------------------------------------- the corpus
 # Spanish legislation is not protected by copyright (art. 13 LPI) and the BOE
 # authorises reuse of its consolidated texts (aviso legal, Ley 37/2007).
-# EUR-Lex: reuse authorised by Commission Decision 2011/833/EU. CNMV: its legal
-# notice allows reuse if reproduced faithfully and the source is cited.
+# CNMV: its legal notice allows reuse if reproduced faithfully and the source
+# is cited. (Directive 2004/25/EC was dropped: EUR-Lex answers scripts with an
+# empty page, and the corpus has 80k words without it.)
 BOE_LICENCE = "BOE: reutilización autorizada (Ley 37/2007, aviso legal BOE); texto consolidado de carácter informativo"
 
 SOURCES = [
@@ -85,23 +86,6 @@ SOURCES = [
         "boe_id": "BOE-A-2023-15549",
         "url": "https://www.boe.es/eli/es/rd/2023/07/04/571/con",
         "licence": BOE_LICENCE,
-    },
-    {
-        "doc_id": "DIR-2004-25",
-        "title": "Directiva 2004/25/CE relativa a las ofertas públicas de adquisición",
-        "short": "Directiva 2004/25/CE (OPAs)",
-        "kind": "eurlex",
-        "url": "https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32004L0025",
-        # EUR-Lex often answers scripts with an empty page (bot protection), so the
-        # Publications Office's machine endpoint (Cellar) is tried next.
-        "mirrors": [
-            ("http://publications.europa.eu/resource/celex/32004L0025",
-             {"Accept": "application/xhtml+xml", "Accept-Language": "spa"}),
-            ("http://publications.europa.eu/resource/celex/32004L0025",
-             {"Accept": "text/html", "Accept-Language": "spa"}),
-        ],
-        "optional": True,  # the corpus is complete without it if no source answers
-        "licence": "EUR-Lex: © Unión Europea, reutilización autorizada (Decisión 2011/833/UE)",
     },
 ]
 SOURCE_BY_ID = {s["doc_id"]: s for s in SOURCES}
