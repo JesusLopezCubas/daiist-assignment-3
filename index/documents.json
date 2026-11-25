@@ -58,5 +58,16 @@
       "fixed": 85,
       "struct": 63
     }
+  },
+  "CNMV-RESULTADO-OPA-BBVA-SABADELL": {
+    "title": "cnmv_resultado_opa_bbva_sabadell",
+    "source": "/workspaces/daiist-assignment-3/docs/cnmv_resultado_opa_bbva_sabadell.pdf",
+    "sha256": "e0e927f91132cfd73d50454a92466f1a5c3afaf9d91969955a9620a89e839c57",
+    "words": 340,
+    "added_by": "add_document",
+    "updated_at": "2026-11-25T17:04:45+00:00",
+    "designs": {
+      "struct": 1
+    }
   }
 }
