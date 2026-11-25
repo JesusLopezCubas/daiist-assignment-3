@@ -45,9 +45,12 @@ RUBRIC = EVAL_DIR / "judge_rubric.md"
 
 RETRIEVAL_RUNS = [(design, mode) for design in DESIGNS for mode in ("dense", "hybrid")]
 KS = (1, 3, 5)
-JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "gemini-3.8-flash")
+# The verdicts in eval/judge_cache.json were produced with gemini-3.5-flash-lite: on
+# 25 Nov 2026 gemini-3.8-flash and gemini-3.5-flash answered 503 (overloaded) for
+# minutes on end. Keeping it as the default lets a re-run reuse the cached verdicts.
+JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "gemini-3.5-flash-lite")
 # If the preferred judge model is not available on this key, fall back in order.
-JUDGE_FALLBACKS = ["gemini-3.5-flash", "gemini-3.5-flash-lite"]
+JUDGE_FALLBACKS = ["gemini-3.5-flash", "gemini-3.8-flash"]
 SLEEP_BETWEEN_QUESTIONS = float(os.environ.get("EVAL_SLEEP", "4"))  # free-tier requests per minute
 
 
