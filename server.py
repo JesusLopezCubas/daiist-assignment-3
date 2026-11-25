@@ -23,8 +23,8 @@ def search(query: str) -> str:
 
     The corpus holds: Real Decreto 1066/2007 on takeover bids (OPAs), the CNMV's
     questions and answers on OPAs, Ley 15/2007 on competition (merger control,
-    phases and deadlines), Ley 19/2003 and Real Decreto 571/2023 on foreign
-    investment screening, and Directive 2004/25/EC. Texts are in Spanish, so
+    phases and deadlines), and Ley 19/2003 and Real Decreto 571/2023 on foreign
+    investment screening. Texts are in Spanish, so
     query in Spanish with the legal terms (e.g. "plazo de aceptación", "venta
     forzosa", "precio equitativo", "segunda fase").
 

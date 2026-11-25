@@ -117,7 +117,10 @@ def _fetch(url: str, accept: str = "*/*", headers: dict | None = None) -> bytes:
 
 
 def _looks_complete(content: bytes) -> bool:
-    """Bot-protection pages and errors are tiny or have no article in them."""
+    """Bot-protection pages and errors are tiny or have no article in them.
+    A PDF's text is compressed, so for PDFs only the header and size are checked."""
+    if content.startswith(b"%PDF"):
+        return len(content) > 20_000
     text = content[:2_000_000].decode("utf-8", errors="ignore")
     return len(content) > 20_000 and ("Artículo" in text or "Art&iacute;culo" in text or "<bloque" in text)
 
