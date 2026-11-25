@@ -46,6 +46,8 @@ RUBRIC = EVAL_DIR / "judge_rubric.md"
 RETRIEVAL_RUNS = [(design, mode) for design in DESIGNS for mode in ("dense", "hybrid")]
 KS = (1, 3, 5)
 JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "gemini-3.8-flash")
+# If the preferred judge model is not available on this key, fall back in order.
+JUDGE_FALLBACKS = ["gemini-3.5-flash", "gemini-3.5-flash-lite"]
 SLEEP_BETWEEN_QUESTIONS = float(os.environ.get("EVAL_SLEEP", "4"))  # free-tier requests per minute
 
 
@@ -271,21 +273,30 @@ def judge(q: dict, res: dict, checks: dict, cache: dict) -> dict:
     from api_key import load_api_key
 
     client = genai.Client(api_key=load_api_key())
-    for attempt in range(5):
-        try:
-            response = client.models.generate_content(
-                model=JUDGE_MODEL, contents=prompt,
-                config=types.GenerateContentConfig(temperature=0, response_mime_type="application/json"),
-            )
-            verdict = json.loads(response.text)
+    models = [JUDGE_MODEL] + [m for m in JUDGE_FALLBACKS if m != JUDGE_MODEL]
+    response, used, last_error = None, None, None
+    for model in models:
+        for attempt in range(5):
+            try:
+                response = client.models.generate_content(
+                    model=model, contents=prompt,
+                    config=types.GenerateContentConfig(temperature=0, response_mime_type="application/json"),
+                )
+                verdict = json.loads(response.text)
+                used = model
+                break
+            except Exception as error:  # noqa: BLE001
+                last_error = error
+                if "404" in str(error) or "NOT_FOUND" in str(error):
+                    break  # model not available: try the next one
+                time.sleep(15 * (attempt + 1))
+        if used:
             break
-        except Exception as error:  # noqa: BLE001
-            if attempt == 4:
-                return {"correct": "", "supported": "", "reason": f"judge failed: {error}", "by": "error"}
-            time.sleep(15 * (attempt + 1))
+    if not used:
+        return {"correct": "", "supported": "", "reason": f"judge failed: {last_error}", "by": "error"}
     usage = getattr(response, "usage_metadata", None)
     verdict = {"correct": int(verdict.get("correct", 0)), "supported": int(verdict.get("supported", 0)),
-               "reason": verdict.get("reason", ""), "by": JUDGE_MODEL,
+               "reason": verdict.get("reason", ""), "by": used,
                "judge_tokens": getattr(usage, "total_token_count", 0) or 0}
     cache[key] = verdict
     JUDGE_CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
